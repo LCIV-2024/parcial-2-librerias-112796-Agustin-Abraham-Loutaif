@@ -13,5 +13,13 @@ import java.util.Optional;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     
     // TODO: Implementar los métodos de la reserva
+    List<Reservation> findByUserId(Long userId);
+
+    List<Reservation> findByStatus(Reservation.ReservationStatus status);
+
+    @Query("SELECT r FROM Reservation r " +
+            "WHERE r.actualReturnDate IS NOT NULL " +
+            "AND r.actualReturnDate > r.expectedReturnDate")
+    List<Reservation> findOverdueReservations();
 }
 
