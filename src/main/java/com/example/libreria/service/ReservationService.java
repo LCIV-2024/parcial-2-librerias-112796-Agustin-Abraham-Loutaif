@@ -82,6 +82,9 @@ public class ReservationService {
         if (reservation.getExpectedReturnDate().isBefore(returnDate)) {
             long dias = Math.abs(ChronoUnit.DAYS.between(reservation.getExpectedReturnDate(), returnDate));
             reservation.setLateFee(calculateLateFee(reservation.getDailyRate(), dias));
+            reservation.setStatus(Reservation.ReservationStatus.OVERDUE);
+        } else {
+            reservation.setStatus(Reservation.ReservationStatus.RETURNED);
         }
 
         // Aumentar la cantidad disponible
@@ -138,7 +141,7 @@ public class ReservationService {
         // 15% del precio del libro por cada día de demora
         // TODO: Implementar el cálculo de la multa por demora
         BigDecimal diasTarde = new BigDecimal(daysLate);
-        BigDecimal porcentaje = new BigDecimal("1.15");
+        BigDecimal porcentaje = new BigDecimal("0.15");
 
         return bookPrice.multiply(porcentaje).multiply(diasTarde);
     }

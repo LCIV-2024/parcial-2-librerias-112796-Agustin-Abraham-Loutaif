@@ -17,9 +17,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByStatus(Reservation.ReservationStatus status);
 
-    @Query("SELECT r FROM Reservation r " +
-            "WHERE r.actualReturnDate IS NOT NULL " +
-            "AND r.actualReturnDate > r.expectedReturnDate")
+    @Query("SELECT r FROM Reservation r WHERE r.status = 'OVERDUE'")
     List<Reservation> findOverdueReservations();
 }
 

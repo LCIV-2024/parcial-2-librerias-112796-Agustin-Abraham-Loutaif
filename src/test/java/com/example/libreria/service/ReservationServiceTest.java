@@ -62,7 +62,7 @@ class ReservationServiceTest {
         testBook.setPrice(new BigDecimal("15.99"));
         testBook.setStockQuantity(10);
         testBook.setAvailableQuantity(5);
-        
+
         testReservation = new Reservation();
         testReservation.setId(1L);
         testReservation.setUser(testUser);
@@ -79,11 +79,34 @@ class ReservationServiceTest {
     @Test
     void testCreateReservation_Success() {
         // TODO: Implementar el test de creación de reserva exitosa
+        when(userService.getUserEntity(1L)).thenReturn(testUser);
+        when(bookRepository.findByExternalId(258027L)).thenReturn(Optional.ofNullable(testBook));
+
+        ReservationRequestDTO requestDTO = new ReservationRequestDTO(1L,258027L,7, LocalDate.now());
+
+        ReservationResponseDTO responseDTO = reservationService.createReservation(requestDTO);
+
+        assertEquals(responseDTO.getUserName(), testReservation.getUser().getName());
+        assertEquals(responseDTO.getBookTitle(), testReservation.getBook().getTitle());
+        assertEquals(responseDTO.getDailyRate(), testReservation.getDailyRate());
+        assertEquals(responseDTO.getTotalFee(), testReservation.getTotalFee());
     }
     
     @Test
     void testCreateReservation_BookNotAvailable() {
         // TODO: Implementar el test de creación de reserva cuando el libro no está disponible
+        testBook.setAvailableQuantity(0);
+
+        when(userService.getUserEntity(1L)).thenReturn(testUser);
+        when(bookRepository.findByExternalId(258027L)).thenReturn(Optional.ofNullable(testBook));
+
+        ReservationRequestDTO requestDTO = new ReservationRequestDTO(1L,258027L,7, LocalDate.now());
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> reservationService.createReservation(requestDTO)
+        );
+
+        assertEquals("El libro no esta disponible para alquilar", exception.getMessage());
     }
     
     @Test
