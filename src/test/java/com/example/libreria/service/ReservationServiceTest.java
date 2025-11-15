@@ -112,11 +112,28 @@ class ReservationServiceTest {
     @Test
     void testReturnBook_OnTime() {
         // TODO: Implementar el test de devolución de libro en tiempo
+
+        when(reservationRepository.findById(1L)).thenReturn(Optional.ofNullable(testReservation));
+
+        ReturnBookRequestDTO requestDTO = new ReturnBookRequestDTO(LocalDate.now().plusDays(2));
+
+        ReservationResponseDTO responseDTO = reservationService.returnBook(1L, requestDTO);
+
+        assertEquals(responseDTO.getStatus(), Reservation.ReservationStatus.RETURNED);
+        assertEquals(responseDTO.getActualReturnDate(), requestDTO.getReturnDate());
     }
     
     @Test
     void testReturnBook_Overdue() {
         // TODO: Implementar el test de devolución de libro con retraso
+        when(reservationRepository.findById(1L)).thenReturn(Optional.ofNullable(testReservation));
+
+        ReturnBookRequestDTO requestDTO = new ReturnBookRequestDTO(LocalDate.now().plusDays(10));
+
+        ReservationResponseDTO responseDTO = reservationService.returnBook(1L, requestDTO);
+
+        assertEquals(responseDTO.getStatus(), Reservation.ReservationStatus.OVERDUE);
+        assertNotNull(responseDTO.getLateFee());
     }
     
     @Test
